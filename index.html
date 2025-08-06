@@ -1,721 +1,367 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fan Engagement Platform - Strategic Plan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Warm Neutrals & Professional Blue -->
     <!-- Application Structure Plan: A thematic, single-page dashboard designed for a business pitch. The structure guides a narrative from the macro opportunity down to the tangible ROI for a team, followed by the future vision. The core "Solution" section is now designed as a grid of composable modules to emphasize flexibility and scalability. Key interactions include an ROI calculator and interactive charts to simplify complex data. -->
     <!-- Visualization & Content Choices: 
         - Market Size (Report Info) -> Goal: Inform -> Viz: Bar Chart (Chart.js) -> Interaction: Hover tooltips -> Justification: Clearly shows market growth potential.
         - Solution Modules (Report Info) -> Goal: Organize/Inform -> Viz: Interactive HTML/CSS grid of "composable modules" -> Interaction: Click to reveal details -> Justification: Emphasizes the platform's flexibility and turn-key nature, allowing partners to envision a custom-fit solution.
-        - Competitive Landscape (Report Info) -> Goal: Compare -> Viz: Scatter Plot (Chart.js) -> Interaction: Hover tooltips -> Justification: Visually demonstrates the unique market position.
+        - Competitive Landscape (Report Info) -> Goal: Compare -> Viz: Interactive HTML/CSS grid of "composable modules" -> Interaction: Click to reveal details -> Justification: Emphasizes the platform's flexibility and turn-key nature, allowing partners to envision a custom-fit solution.
         - Pricing (Report Info) -> Goal: Compare/Inform -> Viz: HTML cards -> Interaction: None -> Justification: Simple, clear presentation of the business model.
         - ROI Calculation (Report Info) -> Goal: Engage/Prove Value -> Viz: HTML Form + JS -> Interaction: User input triggers dynamic calculation -> Justification: Turns abstract benefits and hidden costs into concrete, personalized financial projections.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-      body {
-        font-family: 'Inter', sans-serif;
-        background-color: #f8f7f4;
-        color: #1a202c;
-      }
-      .chart-container {
-        position: relative;
-        width: 100%;
-        max-width: 700px;
-        margin-left: auto;
-        margin-right: auto;
-        height: 350px;
-        max-height: 50vh;
-      }
-      .nav-link {
-        transition: color 0.3s ease;
-      }
-      .nav-link:hover {
-        color: #2563eb;
-      }
-      .module-card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease,
-          border-color 0.3s ease;
-        border: 1px solid #e5e7eb;
-        display: flex;
-        flex-direction: column;
-      }
-      .module-card.active,
-      .module-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1),
-          0 4px 6px -2px rgba(37, 99, 235, 0.05);
-        border-color: #2563eb;
-      }
-      .iphone-mockup {
-        width: 280px;
-        height: 570px;
-        background: #1a202c;
-        border-radius: 40px;
-        padding: 15px;
-        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
-        position: sticky;
-        top: 100px;
-      }
-      .iphone-screen {
-        background: #fff;
-        height: 100%;
-        width: 100%;
-        border-radius: 25px;
-        overflow: hidden;
-        position: relative;
-      }
-      .iphone-notch {
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 140px;
-        height: 25px;
-        background: #1a202c;
-        border-bottom-left-radius: 15px;
-        border-bottom-right-radius: 15px;
-        z-index: 10;
-      }
-      .timeline-item-content {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.5s ease-in-out;
-      }
-      .timeline-item.active .timeline-item-content {
-        max-height: 500px; /* Adjust as needed */
-      }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4;
+            color: #1a202c;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 50vh;
+        }
+        .nav-link {
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #2563eb;
+        }
+        .module-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+        }
+        .module-card.active, .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1), 0 4px 6px -2px rgba(37, 99, 235, 0.05);
+            border-color: #2563eb;
+        }
+        .iphone-mockup {
+            width: 280px;
+            height: 570px;
+            background: #1a202c;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 100px;
+        }
+        .iphone-screen {
+            background: #fff;
+            height: 100%;
+            width: 100%;
+            border-radius: 25px;
+            overflow: hidden;
+            position: relative;
+        }
+        .iphone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 25px;
+            background: #1a202c;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 10;
+        }
+        .timeline-item-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .timeline-item.active .timeline-item-content {
+            max-height: 500px; /* Adjust as needed */
+        }
     </style>
-  </head>
-  <body class="antialiased">
+</head>
+<body class="antialiased">
+
     <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
-      <nav
-        class="container mx-auto px-6 py-3 flex justify-between items-center"
-      >
-        <div class="text-xl font-bold text-gray-800">FanOS</div>
-        <div class="hidden md:flex space-x-8">
-          <a href="#opportunity" class="nav-link text-gray-600">Opportunity</a>
-          <a href="#solution" class="nav-link text-gray-600">Solution</a>
-          <a href="#competition" class="nav-link text-gray-600">Competition</a>
-          <a href="#business-case" class="nav-link text-gray-600"
-            >Business Case</a
-          >
-          <a href="#roadmap" class="nav-link text-gray-600">Roadmap</a>
-        </div>
-      </nav>
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-xl font-bold text-gray-800">FanOS</div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#opportunity" class="nav-link text-gray-600">The Challenge</a>
+                <a href="#solution" class="nav-link text-gray-600">Our Solution</a>
+                <a href="#competition" class="nav-link text-gray-600">Why We're Different</a>
+                <a href="#business-case" class="nav-link text-gray-600">Pricing</a>
+            </div>
+        </nav>
     </header>
 
     <main>
-      <section id="hero" class="py-20 md:py-32 bg-white">
-        <div class="container mx-auto px-6 text-center">
-          <h1
-            class="text-4xl md:text-6xl font-bold text-gray-800 leading-tight mb-4"
-          >
-            The Digital Operating System for Minor League Sports
-          </h1>
-          <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-            An all-in-one fan engagement and revenue platform designed to help
-            teams in leagues like the Frontier League thrive in the digital age.
-          </p>
-        </div>
-      </section>
+        <section id="hero" class="py-20 md:py-32 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold text-gray-800 leading-tight mb-4">The Digital Operating System for Your Team</h1>
+                <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">An all-in-one fan engagement and revenue platform designed to help teams in leagues like the Frontier League thrive in the digital age.</p>
+                 <a href="#" class="mt-8 inline-block bg-blue-600 text-white font-bold py-4 px-8 rounded-lg hover:bg-blue-700 transition-colors">Request a Demo</a>
+            </div>
+        </section>
 
-      <section id="opportunity" class="py-16 md:py-24">
-        <div class="container mx-auto px-6">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">
-              A Large and Underserved Market
-            </h2>
-            <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-              The North American sports industry is booming, but minor and
-              semi-pro teams are left behind by expensive, complex technology.
-              This creates a significant, addressable market gap.
-            </p>
-          </div>
-          <div class="grid md:grid-cols-2 gap-8 items-center">
-            <div class="bg-white p-8 rounded-lg shadow-md">
-              <h3 class="text-xl font-semibold mb-4 text-center">
-                North American Sports Market Growth
-              </h3>
-              <div class="chart-container">
-                <canvas id="marketGrowthChart"></canvas>
-              </div>
-            </div>
-            <div class="space-y-6">
-              <div class="bg-white p-6 rounded-lg shadow-md">
-                <h4 class="text-lg font-semibold text-gray-800">
-                  The Ideal Customer Profile
-                </h4>
-                <p class="mt-2 text-gray-600">
-                  Teams in independent professional leagues like the **Frontier
-                  League, Atlantic League, AHL/ECHL, USL, and the Canadian
-                  Premier League** represent a perfect market fit. They have
-                  passionate fanbases but lack the budget for enterprise tech.
-                  Collegiate athletics (NCAA) represents a key expansion market.
-                </p>
-              </div>
-              <div class="bg-white p-6 rounded-lg shadow-md">
-                <h4 class="text-lg font-semibold text-gray-800">
-                  A Resurgence in Fan Loyalty
-                </h4>
-                <p class="mt-2 text-gray-600">
-                  Post-COVID, teams are re-embracing digital engagement. With
-                  ubiquitous mobile ticketing, even traditionally cautious
-                  organizations see that "loyalty is very hot" and are actively
-                  seeking cost-effective, turnkey solutions that don't require
-                  large internal tech teams. Our timing is perfect to meet this
-                  rising demand.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="solution" class="py-16 md:py-24 bg-white">
-        <div class="container mx-auto px-6">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">
-              The "Shopify for Sports Clubs"
-            </h2>
-            <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-              Our platform is a composable, all-in-one digital headquarters.
-              Teams can start with our core offering and add capabilities as
-              they grow, all managed from a single backend. Each module is
-              designed to generate clear ROI.
-            </p>
-          </div>
-          <div class="grid lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 grid md:grid-cols-2 gap-6">
-              <div
-                id="module-app"
-                class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer"
-                onclick="showFeatureDetail('app')"
-              >
-                <h3 class="text-lg font-semibold text-gray-800">
-                  White-Label Mobile App
-                </h3>
-                <p class="mt-2 text-gray-600 text-sm flex-grow">
-                  The core fan hub for iOS & Android, providing a direct
-                  communication channel to fans.
-                </p>
-                <p class="mt-4 text-sm font-semibold text-blue-600">
-                  Value: Saves an estimated $25,000+ in custom app development
-                  costs.
-                </p>
-              </div>
-              <div
-                id="module-ecommerce"
-                class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer"
-                onclick="showFeatureDetail('ecommerce')"
-              >
-                <h3 class="text-lg font-semibold text-gray-800">
-                  Turn-Key E-commerce
-                </h3>
-                <p class="mt-2 text-gray-600 text-sm flex-grow">
-                  A complete, integrated online store for merchandise, enabling
-                  24/7 sales.
-                </p>
-                <p class="mt-4 text-sm font-semibold text-blue-600">
-                  Value: Loyalty members spend 10-12% more on average per
-                  transaction.
-                </p>
-              </div>
-              <div
-                id="module-ticketing"
-                class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer"
-                onclick="showFeatureDetail('ticketing')"
-              >
-                <h3 class="text-lg font-semibold text-gray-800">
-                  Ticketing & Memberships
-                </h3>
-                <p class="mt-2 text-gray-600 text-sm flex-grow">
-                  Sell tickets, create recurring revenue streams, and drive
-                  attendance with loyalty points.
-                </p>
-                <p class="mt-4 text-sm font-semibold text-blue-600">
-                  Value: Increase attendance for targeted games and convert
-                  single-game buyers to package holders.
-                </p>
-              </div>
-              <div
-                id="module-sponsorship"
-                class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer"
-                onclick="showFeatureDetail('sponsorship')"
-              >
-                <h3 class="text-lg font-semibold text-gray-800">
-                  Sponsorship Activation
-                </h3>
-                <p class="mt-2 text-gray-600 text-sm flex-grow">
-                  Digital tools to create, sell, and report on interactive
-                  sponsor campaigns.
-                </p>
-                <p class="mt-4 text-sm font-semibold text-blue-600">
-                  Value: Create new digital inventory to sell for $5,000+ per
-                  sponsor, per season.
-                </p>
-              </div>
-              <div
-                id="module-gamification"
-                class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer"
-                onclick="showFeatureDetail('gamification')"
-              >
-                <h3 class="text-lg font-semibold text-gray-800">
-                  Fan Gamification
-                </h3>
-                <p class="mt-2 text-gray-600 text-sm flex-grow">
-                  Simple prediction games, polls, and trivia to drive daily
-                  engagement and create sponsor inventory.
-                </p>
-                <p class="mt-4 text-sm font-semibold text-blue-600">
-                  Value: Increases daily app opens and provides new, sellable
-                  sponsorship opportunities.
-                </p>
-              </div>
-              <div
-                id="module-analytics"
-                class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer"
-                onclick="showFeatureDetail('analytics')"
-              >
-                <h3 class="text-lg font-semibold text-gray-800">
-                  Analytics & Marketing
-                </h3>
-                <p class="mt-2 text-gray-600 text-sm flex-grow">
-                  A unified Fan CRM, analytics dashboard, and integrated
-                  email/push notification platform.
-                </p>
-                <p class="mt-4 text-sm font-semibold text-blue-600">
-                  Value: Make marketing spend more efficient by proving ROI on
-                  campaigns and targeting the right fans.
-                </p>
-              </div>
-            </div>
-            <div class="hidden lg:flex justify-center items-start">
-              <div class="iphone-mockup">
-                <div class="iphone-screen">
-                  <div class="iphone-notch"></div>
-                  <img
-                    id="mockupScreen"
-                    src="https://placehold.co/400x800/e2e8f0/4a5568?text=Click+a+Feature"
-                    alt="App Mockup Screen"
-                    class="w-full h-full object-cover"
-                  />
+        <section id="opportunity" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">The Challenge Facing Today's Teams</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Minor and semi-pro teams are the heart of local sports, but are left behind by expensive, complex technology, making it harder to grow revenue and engage the next generation of fans.</p>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="competition" class="py-16 md:py-24">
-        <div class="container mx-auto px-6">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">
-              Our Competitive Edge in a Fragmented Market
-            </h2>
-            <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-              The market is active but fragmented. While specialists like
-              **FanMaker** excel at loyalty and **FanSaves** focuses on coupons,
-              teams are forced into costly, piecemeal solutions. Our all-in-one
-              platform fills this strategic void for the minor league niche.
-            </p>
-          </div>
-          <div class="bg-white p-8 rounded-lg shadow-md">
-            <div class="chart-container" style="height: 450px">
-              <canvas id="competitionChart"></canvas>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="business-case" class="py-16 md:py-24 bg-white">
-        <div class="container mx-auto px-6">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">
-              The Business Case: A Clear ROI
-            </h2>
-            <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-              Our platform is more than a tool; it's a financial strategy. We
-              help you generate new revenue and capture value that's currently
-              being lost. We are a revenue partner, not a cost center.
-            </p>
-          </div>
-
-          <div class="grid lg:grid-cols-3 gap-8 mb-16 text-center">
-            <div class="border border-gray-200 p-8 rounded-lg">
-              <h3 class="text-2xl font-semibold mb-2">Starter</h3>
-              <p class="text-4xl font-bold mb-4">
-                $299<span class="text-lg font-medium text-gray-500">/mo</span>
-              </p>
-              <p class="text-gray-600 mb-4">+ 3-5% transaction fee</p>
-              <p class="text-gray-500">
-                Core app, basic gamification, standard sponsorship templates.
-              </p>
-            </div>
-            <div class="border-2 border-blue-600 p-8 rounded-lg relative">
-              <div
-                class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 text-sm font-semibold rounded-full"
-              >
-                Most Popular
-              </div>
-              <h3 class="text-2xl font-semibold mb-2">Pro</h3>
-              <p class="text-4xl font-bold mb-4">
-                $799<span class="text-lg font-medium text-gray-500">/mo</span>
-              </p>
-              <p class="text-gray-600 mb-4">+ 1-2% transaction fee</p>
-              <p class="text-gray-500">
-                Adds E-commerce, Analytics & Marketing, priority support.
-              </p>
-            </div>
-            <div class="border border-gray-200 p-8 rounded-lg">
-              <h3 class="text-2xl font-semibold mb-2">League Partner</h3>
-              <p class="text-4xl font-bold mb-4">Custom</p>
-              <p class="text-gray-600 mb-4">Volume discount</p>
-              <p class="text-gray-500">
-                League-wide analytics, centralized content distribution.
-              </p>
-            </div>
-          </div>
-
-          <div class="text-center mb-12">
-            <h3 class="text-2xl font-bold text-gray-800">
-              First-Year Revenue Scenarios
-            </h3>
-            <div class="grid md:grid-cols-3 gap-8 mt-6 text-left">
-              <div class="bg-gray-50 p-6 rounded-lg">
-                <h4 class="font-semibold text-lg">Conservative</h4>
-                <p class="text-2xl font-bold mt-2">$75,000</p>
-                <p class="text-gray-600 mt-1">5 teams @ ~$15k avg. revenue</p>
-              </div>
-              <div class="bg-gray-50 p-6 rounded-lg">
-                <h4 class="font-semibold text-lg">Realistic</h4>
-                <p class="text-2xl font-bold mt-2">$150,000</p>
-                <p class="text-gray-600 mt-1">10 teams @ ~$15k avg. revenue</p>
-              </div>
-              <div class="bg-gray-50 p-6 rounded-lg">
-                <h4 class="font-semibold text-lg">Aggressive</h4>
-                <p class="text-2xl font-bold mt-2">$400,000</p>
-                <p class="text-gray-600 mt-1">20 teams @ ~$20k avg. revenue</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="roadmap" class="py-16 md:py-24">
-        <div class="container mx-auto px-6">
-          <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">
-              Innovation Roadmap: Building a Competitive Moat
-            </h2>
-            <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-              Our vision extends beyond the MVP. We have a pragmatic plan to
-              integrate cutting-edge features, building a long-term defensible
-              advantage by solving core operational challenges.
-            </p>
-          </div>
-          <div class="relative">
-            <div
-              class="border-l-2 border-blue-200 absolute h-full top-0 left-4"
-            ></div>
-            <div id="timelineContainer" class="space-y-12">
-              <div
-                class="timeline-item pl-12 relative cursor-pointer"
-                data-phase="crawl"
-              >
-                <div
-                  class="absolute w-8 h-8 bg-white border-4 border-blue-500 rounded-full -left-4 mt-1"
-                ></div>
-                <h3 class="text-2xl font-semibold text-blue-600">
-                  Phase 1: Crawl (Year 1)
-                </h3>
-                <p class="text-gray-600 font-medium">
-                  Focus: AI-Powered Automation & Efficiency
-                </p>
-                <div class="timeline-item-content mt-2 text-gray-600">
-                  <ul class="list-disc list-inside space-y-1">
-                    <li>
-                      <strong>AI Fan Support Chatbot:</strong> Handle common fan
-                      inquiries 24/7 to free up staff time.
-                    </li>
-                    <li>
-                      <strong>Automated Fan Segmentation:</strong> Use basic ML
-                      to automatically tag fans (e.g., "At-Risk of Churn,"
-                      "High-Value Spender") for easier targeted marketing.
-                    </li>
-                  </ul>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="bg-white p-8 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-4 text-center">North American Sports Market Growth</h3>
+                        <div class="chart-container">
+                            <canvas id="marketGrowthChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h4 class="text-lg font-semibold text-gray-800">Resource Scarcity</h4>
+                            <p class="mt-2 text-gray-600">With a small front office, your staff wears multiple hats. You need powerful tools that are simple to use and save time, not create more work.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h4 class="text-lg font-semibold text-gray-800">The Sponsorship Dilemma</h4>
+                            <p class="mt-2 text-gray-600">Local sponsors are your lifeblood, but they demand clear ROI. You need to offer them digital activations they can't get anywhere else and prove the value of their investment with hard data.</p>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <div
-                class="timeline-item pl-12 relative cursor-pointer"
-                data-phase="walk"
-              >
-                <div
-                  class="absolute w-8 h-8 bg-white border-4 border-blue-500 rounded-full -left-4 mt-1"
-                ></div>
-                <h3 class="text-2xl font-semibold text-blue-600">
-                  Phase 2: Walk (Years 2-3)
-                </h3>
-                <p class="text-gray-600 font-medium">
-                  Focus: Revenue Optimization & Enhanced Experience
-                </p>
-                <div class="timeline-item-content mt-2 text-gray-600">
-                  <ul class="list-disc list-inside space-y-1">
-                    <li>
-                      <strong>Predictive Ticketing Analytics:</strong> Forecast
-                      attendance for upcoming games to optimize promotions and
-                      staffing.
-                    </li>
-                    <li>
-                      <strong>Personalized Recommendations:</strong> AI engine
-                      to surface the most relevant content and merchandise to
-                      each fan.
-                    </li>
-                    <li>
-                      <strong>Augmented Reality (AR) Experiences:</strong>
-                      In-stadium AR scavenger hunts and photo filters to create
-                      buzz and social sharing.
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div
-                class="timeline-item pl-12 relative cursor-pointer"
-                data-phase="run"
-              >
-                <div
-                  class="absolute w-8 h-8 bg-white border-4 border-blue-500 rounded-full -left-4 mt-1"
-                ></div>
-                <h3 class="text-2xl font-semibold text-blue-600">
-                  Phase 3: Run (Years 4+)
-                </h3>
-                <p class="text-gray-600 font-medium">
-                  Focus: Generative AI & Frictionless Loyalty
-                </p>
-                <div class="timeline-item-content mt-2 text-gray-600">
-                  <ul class="list-disc list-inside space-y-1">
-                    <li>
-                      <strong>Generative AI for Content:</strong> Automatically
-                      create post-game summaries and personalized fan messages.
-                    </li>
-                    <li>
-                      <strong>Card-Linked Offers:</strong> Allow fans to
-                      automatically earn points by linking their credit card and
-                      shopping at team sponsors, extending loyalty beyond the
-                      stadium.
-                    </li>
-                    <li>
-                      <strong>Hyper-Personalized Fan Journeys:</strong> Use AI
-                      to guide each fan along an automated, individualized path
-                      that maximizes their lifetime value.
-                    </li>
-                  </ul>
-                </div>
-              </div>
             </div>
-          </div>
-        </div>
-      </section>
+        </section>
+
+        <section id="solution" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">The All-in-One Platform to Run Your Team</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">FanOS is a composable, integrated digital headquarters. Start with our core features and add capabilities as you grow, all managed from a single backend. Each module is designed to generate clear ROI.</p>
+                </div>
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 grid md:grid-cols-2 gap-6">
+                        <div id="module-app" class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer" onclick="showFeatureDetail('app')">
+                            <h3 class="text-lg font-semibold text-gray-800">White-Label Mobile App</h3>
+                            <p class="mt-2 text-gray-600 text-sm flex-grow">The core fan hub for iOS & Android, providing a direct communication channel to fans.</p>
+                            <p class="mt-4 text-sm font-semibold text-blue-600">Value: Saves an estimated $25,000+ in custom app development costs.</p>
+                        </div>
+                        <div id="module-gamification" class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer" onclick="showFeatureDetail('gamification')">
+                            <h3 class="text-lg font-semibold text-gray-800">Fan Gamification & Missions</h3>
+                            <p class="mt-2 text-gray-600 text-sm flex-grow">Drive daily engagement with trivia, polls, video challenges, and a "daily spin" wheel.</p>
+                            <p class="mt-4 text-sm font-semibold text-blue-600">Value: Increases daily app opens and provides new, sellable sponsorship opportunities.</p>
+                        </div>
+                        <div id="module-ticketing" class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer" onclick="showFeatureDetail('ticketing')">
+                            <h3 class="text-lg font-semibold text-gray-800">Ticketing & Memberships</h3>
+                            <p class="mt-2 text-gray-600 text-sm flex-grow">Sell tickets, create recurring revenue streams, and drive attendance with loyalty points.</p>
+                            <p class="mt-4 text-sm font-semibold text-blue-600">Value: Increase attendance for targeted games and convert single-game buyers to package holders.</p>
+                        </div>
+                        <div id="module-sponsorship" class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer" onclick="showFeatureDetail('sponsorship')">
+                            <h3 class="text-lg font-semibold text-gray-800">Sponsorship Activation</h3>
+                            <p class="mt-2 text-gray-600 text-sm flex-grow">Digital tools to create, sell, and report on interactive sponsor campaigns.</p>
+                            <p class="mt-4 text-sm font-semibold text-blue-600">Value: Create new digital inventory to sell for $5,000+ per sponsor, per season.</p>
+                        </div>
+                         <div id="module-ecommerce" class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer" onclick="showFeatureDetail('ecommerce')">
+                            <h3 class="text-lg font-semibold text-gray-800">Turn-Key E-commerce</h3>
+                            <p class="mt-2 text-gray-600 text-sm flex-grow">A complete, integrated online store for merchandise, enabling 24/7 sales.</p>
+                            <p class="mt-4 text-sm font-semibold text-blue-600">Value: Loyalty members spend 10-12% more on average per transaction.</p>
+                        </div>
+                        <div id="module-wallet" class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer" onclick="showFeatureDetail('wallet')">
+                            <h3 class="text-lg font-semibold text-gray-800">Unified Fan Wallet</h3>
+                            <p class="mt-2 text-gray-600 text-sm flex-grow">Fans can store and redeem digital rewards, coupons, and tickets directly from their phone.</p>
+                            <p class="mt-4 text-sm font-semibold text-blue-600">Value: Increases sponsor ROI through measurable coupon redemptions and drives in-venue sales.</p>
+                        </div>
+                    </div>
+                    <div class="hidden lg:flex justify-center items-start">
+                        <div class="iphone-mockup">
+                            <div class="iphone-screen">
+                                <div class="iphone-notch"></div>
+                                <img id="mockupScreen" src="https://placehold.co/400x800/e2e8f0/4a5568?text=Click+a+Feature" alt="App Mockup Screen" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="competition" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Why We're Different</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">The market is active but fragmented. While specialists focus on one piece of the puzzle, teams are forced into costly, piecemeal solutions. Our all-in-one platform fills this strategic void for the minor league niche.</p>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-md overflow-x-auto">
+                    <table class="w-full min-w-[600px] text-left">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="p-4 font-semibold text-gray-700">Feature</th>
+                                <th class="p-4 font-semibold text-center text-gray-700 bg-blue-50">FanOS (Us)</th>
+                                <th class="p-4 font-semibold text-center text-gray-700">Loyalty Specialists<br><span class="text-xs font-normal text-gray-500">(e.g., FanMaker)</span></th>
+                                <th class="p-4 font-semibold text-center text-gray-700">Enterprise Platforms<br><span class="text-xs font-normal text-gray-500">(e.g., KORE)</span></th>
+                                <th class="p-4 font-semibold text-center text-gray-700">Amateur Tools<br><span class="text-xs font-normal text-gray-500">(e.g., TeamLinkt)</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-100">
+                                <td class="p-4">All-in-One Platform</td>
+                                <td class="p-4 text-center text-green-500 font-bold text-xl bg-blue-50">✓</td>
+                                <td class="p-4 text-center text-gray-400 font-bold text-xl">-</td>
+                                <td class="p-4 text-center text-green-500 font-bold text-xl">✓</td>
+                                <td class="p-4 text-center text-green-500 font-bold text-xl">✓</td>
+                            </tr>
+                            <tr class="bg-gray-50 border-b border-gray-200">
+                                <td class="p-4">Advanced Loyalty & Gamification</td>
+                                <td class="p-4 text-center text-green-500 font-bold text-xl bg-blue-50">✓</td>
+                                <td class="p-4 text-center text-green-500 font-bold text-xl">✓</td>
+                                <td class="p-4 text-center text-gray-400 font-bold text-xl">-</td>
+                                <td class="p-4 text-center text-gray-400 font-bold text-xl">-</td>
+                            </tr>
+                            <tr class="border-b border-gray-100">
+                                <td class="p-4">Sponsorship Activation Suite</td>
+                                <td class="p-4 text-center text-green-500 font-bold text-xl bg-blue-50">✓</td>
+                                <td class="p-4 text-center text-gray-400 font-bold text-xl">-</td>
+                                <td class="p-4 text-center text-green-500 font-bold text-xl">✓</td>
+                                <td class="p-4 text-center text-gray-400 font-bold text-xl">-</td>
+                            </tr>
+                             <tr class="bg-gray-50 border-b border-gray-200">
+                                <td class="p-4">Turn-Key E-commerce</td>
+                                <td class="p-4 text-center text-green-500 font-bold text-xl bg-blue-50">✓</td>
+                                <td class="p-4 text-center text-gray-400 font-bold text-xl">-</td>
+                                <td class="p-4 text-center text-green-500 font-bold text-xl">✓</td>
+                                <td class="p-4 text-center text-gray-400 font-bold text-xl">-</td>
+                            </tr>
+                            <tr class="border-b border-gray-100">
+                                <td class="p-4">Affordable for Minor Leagues</td>
+                                <td class="p-4 text-center text-green-500 font-bold text-xl bg-blue-50">✓</td>
+                                <td class="p-4 text-center text-gray-400 font-bold text-xl">?</td>
+                                <td class="p-4 text-center text-red-500 font-bold text-xl">✕</td>
+                                <td class="p-4 text-center text-green-500 font-bold text-xl">✓</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="business-case" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Simple, Transparent Pricing</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">Our pricing model is designed to be an accessible investment that grows with your success. We're a revenue partner, not a cost center.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-8 mb-16 text-center">
+                    <div class="border border-gray-200 p-8 rounded-lg">
+                        <h3 class="text-2xl font-semibold mb-2">Starter</h3>
+                        <p class="text-4xl font-bold mb-4">$299<span class="text-lg font-medium text-gray-500">/mo</span></p>
+                        <p class="text-gray-600 mb-4">+ 3-5% transaction fee</p>
+                        <p class="text-gray-500">Core app, basic gamification, standard sponsorship templates.</p>
+                    </div>
+                    <div class="border-2 border-blue-600 p-8 rounded-lg relative">
+                        <div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 text-sm font-semibold rounded-full">Most Popular</div>
+                        <h3 class="text-2xl font-semibold mb-2">Pro</h3>
+                        <p class="text-4xl font-bold mb-4">$799<span class="text-lg font-medium text-gray-500">/mo</span></p>
+                        <p class="text-gray-600 mb-4">+ 1-2% transaction fee</p>
+                        <p class="text-gray-500">Adds E-commerce, Analytics & Marketing, priority support.</p>
+                    </div>
+                    <div class="border border-gray-200 p-8 rounded-lg">
+                        <h3 class="text-2xl font-semibold mb-2">League Partner</h3>
+                        <p class="text-4xl font-bold mb-4">Custom</p>
+                        <p class="text-gray-600 mb-4">Volume discount</p>
+                        <p class="text-gray-500">League-wide analytics, centralized content distribution.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer class="bg-gray-800 text-white py-12">
-      <div class="container mx-auto px-6 text-center">
-        <h2 class="text-2xl font-bold mb-4">Ready to Partner?</h2>
-        <p class="max-w-xl mx-auto mb-6">
-          Let's build the future of fan engagement together. We believe this
-          platform will become the definitive digital operating system for minor
-          league sports.
-        </p>
-        <a
-          href="#"
-          class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors"
-          >Contact Us</a
-        >
-      </div>
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-2xl font-bold mb-4">Ready to Grow Your Revenue?</h2>
+            <p class="max-w-xl mx-auto mb-6">Let's build the future of fan engagement together. See how FanOS can become the definitive digital operating system for your team.</p>
+            <a href="#" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors">Request a Free Demo</a>
+        </div>
     </footer>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        const marketGrowthCtx = document
-          .getElementById('marketGrowthChart')
-          .getContext('2d');
-        new Chart(marketGrowthCtx, {
-          type: 'bar',
-          data: {
-            labels: ['2025 (Projected)', '2030 (Projected)'],
-            datasets: [
-              {
-                label: 'Market Size (USD Billions)',
-                data: [49.38, 77.78],
-                backgroundColor: [
-                  'rgba(59, 130, 246, 0.6)',
-                  'rgba(37, 99, 235, 0.8)',
-                ],
-                borderColor: ['rgba(59, 130, 246, 1)', 'rgba(37, 99, 235, 1)'],
-                borderWidth: 1,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                beginAtZero: true,
-                title: {
-                  display: true,
-                  text: 'Market Size (USD Billions)',
+        document.addEventListener('DOMContentLoaded', function () {
+            const marketGrowthCtx = document.getElementById('marketGrowthChart').getContext('2d');
+            new Chart(marketGrowthCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['2025 (Projected)', '2030 (Projected)'],
+                    datasets: [{
+                        label: 'Market Size (USD Billions)',
+                        data: [49.38, 77.78],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.6)',
+                            'rgba(37, 99, 235, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(37, 99, 235, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
                 },
-              },
-            },
-            plugins: {
-              legend: {
-                display: false,
-              },
-              tooltip: {
-                callbacks: {
-                  label: function (context) {
-                    return `$${context.raw} Billion`;
-                  },
-                },
-              },
-            },
-          },
-        });
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Market Size (USD Billions)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `$${context.raw} Billion`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
 
-        const competitionCtx = document
-          .getElementById('competitionChart')
-          .getContext('2d');
-        const competitionData = {
-          datasets: [
-            {
-              label: 'Our Platform (FanOS)',
-              data: [{ x: 9, y: 2 }],
-              backgroundColor: 'rgba(239, 68, 68, 1)',
-              pointRadius: 10,
-              pointHoverRadius: 12,
-            },
-            {
-              label: 'Enterprise Platforms (e.g., KORE)',
-              data: [{ x: 8, y: 9 }],
-              backgroundColor: 'rgba(59, 130, 246, 0.7)',
-              pointRadius: 8,
-              pointHoverRadius: 10,
-            },
-            {
-              label: 'Loyalty Specialists (e.g., FanMaker, Affina)',
-              data: [{ x: 3, y: 4 }],
-              backgroundColor: 'rgba(234, 179, 8, 0.7)',
-              pointRadius: 8,
-              pointHoverRadius: 10,
-            },
-            {
-              label: 'Mid-Market Players (e.g., Fanbase)',
-              data: [{ x: 6, y: 3 }],
-              backgroundColor: 'rgba(34, 197, 94, 0.7)',
-              pointRadius: 8,
-              pointHoverRadius: 10,
-            },
-            {
-              label: 'Amateur Tools (e.g., TeamLinkt)',
-              data: [{ x: 4, y: 1 }],
-              backgroundColor: 'rgba(168, 85, 247, 0.7)',
-              pointRadius: 8,
-              pointHoverRadius: 10,
-            },
-          ],
-        };
-        new Chart(competitionCtx, {
-          type: 'scatter',
-          data: competitionData,
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              x: {
-                min: 0,
-                max: 10,
-                title: {
-                  display: true,
-                  text: 'Platform Integration (Niche -> All-in-One)',
-                  font: { size: 14 },
-                },
-              },
-              y: {
-                min: 0,
-                max: 10,
-                title: {
-                  display: true,
-                  text: 'Target Market (Amateur -> Enterprise)',
-                  font: { size: 14 },
-                },
-              },
-            },
-            plugins: {
-              legend: {
-                position: 'bottom',
-              },
-              tooltip: {
-                callbacks: {
-                  label: function (context) {
-                    return ` ${context.dataset.label}`;
-                  },
-                },
-              },
-            },
-          },
-        });
+            const mockupScreen = document.getElementById('mockupScreen');
+            const moduleCards = document.querySelectorAll('.module-card');
+            const mockupImages = {
+                app: 'https://placehold.co/400x800/e2e8f0/4a5568?text=Team+Homepage',
+                ecommerce: 'https://placehold.co/400x800/e2e8f0/4a5568?text=Merch+Store',
+                ticketing: 'https://placehold.co/400x800/e2e8f0/4a5568?text=Digital+Tickets',
+                sponsorship: 'https://placehold.co/400x800/e2e8f0/4a5568?text=Sponsor+Offer',
+                gamification: 'https://placehold.co/400x800/e2e8f0/4a5568?text=Missions+List',
+                analytics: 'https://placehold.co/400x800/e2e8f0/4a5568?text=Fan+Dashboard',
+                wallet: 'https://placehold.co/400x800/e2e8f0/4a5568?text=Fan+Wallet',
+            };
 
-        const mockupScreen = document.getElementById('mockupScreen');
-        const moduleCards = document.querySelectorAll('.module-card');
-        const mockupImages = {
-          app: 'https://placehold.co/400x800/e2e8f0/4a5568?text=Team+Homepage',
-          ecommerce:
-            'https://placehold.co/400x800/e2e8f0/4a5568?text=Merch+Store',
-          ticketing:
-            'https://placehold.co/400x800/e2e8f0/4a5568?text=Digital+Tickets',
-          sponsorship:
-            'https://placehold.co/400x800/e2e8f0/4a5568?text=Sponsor+Offer',
-          gamification:
-            'https://placehold.co/400x800/e2e8f0/4a5568?text=Trivia+Game',
-          analytics:
-            'https://placehold.co/400x800/e2e8f0/4a5568?text=Fan+Dashboard',
-        };
+            window.showFeatureDetail = function(feature) {
+                if (mockupImages[feature]) {
+                    mockupScreen.src = mockupImages[feature];
+                }
 
-        window.showFeatureDetail = function (feature) {
-          // Update mockup screen
-          if (mockupImages[feature]) {
-            mockupScreen.src = mockupImages[feature];
-          }
-
-          // Highlight active card
-          moduleCards.forEach((card) => {
-            card.classList.remove('active');
-          });
-          document.getElementById(`module-${feature}`).classList.add('active');
-        };
-
-        const timelineItems = document.querySelectorAll('.timeline-item');
-        timelineItems.forEach((item) => {
-          item.addEventListener('click', () => {
-            const wasActive = item.classList.contains('active');
-            timelineItems.forEach((i) => i.classList.remove('active'));
-            if (!wasActive) {
-              item.classList.add('active');
+                moduleCards.forEach(card => {
+                    card.classList.remove('active');
+                });
+                document.getElementById(`module-${feature}`).classList.add('active');
             }
-          });
         });
-      });
     </script>
-  </body>
+</body>
 </html>
