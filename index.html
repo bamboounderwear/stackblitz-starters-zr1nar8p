@@ -45,6 +45,7 @@
             border: 1px solid #e5e7eb;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
         .module-card.active, .module-card:hover {
             transform: translateY(-5px);
@@ -80,14 +81,6 @@
             border-bottom-left-radius: 15px;
             border-bottom-right-radius: 15px;
             z-index: 10;
-        }
-        .timeline-item-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-in-out;
-        }
-        .timeline-item.active .timeline-item-content {
-            max-height: 500px; /* Adjust as needed */
         }
     </style>
 </head>
@@ -165,11 +158,13 @@
                             <p class="mt-4 text-sm font-semibold text-blue-600">Value: Increase attendance for targeted games and convert single-game buyers to package holders.</p>
                         </div>
                         <div id="module-sponsorship" class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer" onclick="showFeatureDetail('sponsorship')">
+                             <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">Beta Coming Soon</div>
                             <h3 class="text-lg font-semibold text-gray-800">Sponsorship Activation</h3>
                             <p class="mt-2 text-gray-600 text-sm flex-grow">Digital tools to create, sell, and report on interactive sponsor campaigns.</p>
                             <p class="mt-4 text-sm font-semibold text-blue-600">Value: Create new digital inventory to sell for $5,000+ per sponsor, per season.</p>
                         </div>
                          <div id="module-ecommerce" class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer" onclick="showFeatureDetail('ecommerce')">
+                            <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">Beta Coming Soon</div>
                             <h3 class="text-lg font-semibold text-gray-800">Turn-Key E-commerce</h3>
                             <p class="mt-2 text-gray-600 text-sm flex-grow">A complete, integrated online store for merchandise, enabling 24/7 sales.</p>
                             <p class="mt-4 text-sm font-semibold text-blue-600">Value: Loyalty members spend 10-12% more on average per transaction.</p>
@@ -178,6 +173,18 @@
                             <h3 class="text-lg font-semibold text-gray-800">Unified Fan Wallet</h3>
                             <p class="mt-2 text-gray-600 text-sm flex-grow">Fans can store and redeem digital rewards, coupons, and tickets directly from their phone.</p>
                             <p class="mt-4 text-sm font-semibold text-blue-600">Value: Increases sponsor ROI through measurable coupon redemptions and drives in-venue sales.</p>
+                        </div>
+                         <div id="module-analytics" class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer" onclick="showFeatureDetail('analytics')">
+                            <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">Beta Coming Soon</div>
+                            <h3 class="text-lg font-semibold text-gray-800">Marketing & Fan Analytics</h3>
+                            <p class="mt-2 text-gray-600 text-sm flex-grow">Fan CRM, analytics, plus branded templates and automated social ad campaigns.</p>
+                            <p class="mt-4 text-sm font-semibold text-blue-600">Value: Make marketing spend more efficient by proving ROI on campaigns and targeting the right fans.</p>
+                        </div>
+                        <div id="module-ai" class="module-card bg-gray-50 p-6 rounded-lg cursor-pointer" onclick="showFeatureDetail('ai')">
+                            <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">Beta Coming Soon</div>
+                            <h3 class="text-lg font-semibold text-gray-800">AI-Powered Automation</h3>
+                            <p class="mt-2 text-gray-600 text-sm flex-grow">Leverage LLMs for instant fan support chatbots and generative AI for automated game summaries.</p>
+                            <p class="mt-4 text-sm font-semibold text-blue-600">Value: Drastically reduce staff workload and create engaging content effortlessly.</p>
                         </div>
                     </div>
                     <div class="hidden lg:flex justify-center items-start">
@@ -347,8 +354,9 @@
                 ticketing: 'https://placehold.co/400x800/e2e8f0/4a5568?text=Digital+Tickets',
                 sponsorship: 'https://placehold.co/400x800/e2e8f0/4a5568?text=Sponsor+Offer',
                 gamification: 'https://placehold.co/400x800/e2e8f0/4a5568?text=Missions+List',
-                analytics: 'https://placehold.co/400x800/e2e8f0/4a5568?text=Fan+Dashboard',
+                analytics: 'https://placehold.co/400x800/e2e8f0/4a5568?text=Social+Ads+Dashboard',
                 wallet: 'https://placehold.co/400x800/e2e8f0/4a5568?text=Fan+Wallet',
+                ai: 'https://placehold.co/400x800/e2e8f0/4a5568?text=AI+Fan+Chatbot',
             };
 
             window.showFeatureDetail = function(feature) {
