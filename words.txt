@@ -1,9 +1,7 @@
-love
-money
-star
-light
-shine
-storm
-glow
-hope
-dream
+baseball
+unity
+ballpark
+frontier
+loyalty
+capitales
+fan
