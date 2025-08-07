@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Domain Checker</title>
+  <title>Markov Domain Generator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,34 +13,85 @@
       padding: 10px 20px;
       margin: 10px;
       font-size: 16px;
+      cursor: pointer;
     }
     #status {
       margin-top: 20px;
       font-weight: bold;
     }
+    #wordDisplay {
+      font-size: 32px;
+      margin: 20px;
+      color: #333;
+    }
   </style>
 </head>
 <body>
 
-  <h1>Random Word Domain Checker</h1>
-  <h2 id="wordDisplay">loading...</h2>
+  <h1>Markov Domain Generator</h1>
+  <h2 id="wordDisplay">Loading...</h2>
 
-  <button onclick="generateWord()">🔁 New Word</button>
+  <button onclick="generateMarkovWord()">🔁 New Word</button>
   <button onclick="checkAvailability()">🔍 Check .com</button>
 
   <div id="status"></div>
 
   <script>
-    const words = [
-      "zebra", "lunar", "orbit", "tiger", "nexus", "flare",
-      "echo", "glyph", "nova", "blaze", "vortex", "quark"
-    ];
-
     let currentWord = "";
+    let markovChain = {};
+    let seedWords = [];
 
-    function generateWord() {
-      currentWord = words[Math.floor(Math.random() * words.length)];
-      document.getElementById("wordDisplay").textContent = currentWord;
+    // Load training words from words.txt
+    async function loadWords() {
+      try {
+        const response = await fetch('words.txt');
+        const text = await response.text();
+        seedWords = text.split(/\r?\n/).map(w => w.trim().toLowerCase()).filter(Boolean);
+        buildMarkovChain(seedWords);
+        generateMarkovWord(); // Show first word
+      } catch (err) {
+        document.getElementById("wordDisplay").textContent = "⚠️ Failed to load words.txt";
+        console.error("Error loading words.txt:", err);
+      }
+    }
+
+    // Build Markov chain with n-gram prefixes
+    function buildMarkovChain(words, n = 2) {
+      markovChain = {};
+      for (const word of words) {
+        const padded = "^".repeat(n - 1) + word + "$";
+        for (let i = 0; i <= padded.length - n; i++) {
+          const prefix = padded.slice(i, i + n - 1);
+          const nextChar = padded[i + n - 1];
+          if (!markovChain[prefix]) markovChain[prefix] = [];
+          markovChain[prefix].push(nextChar);
+        }
+      }
+    }
+
+    // Generate a new pseudo-word
+    function generateWord(maxLength = 10, n = 2) {
+      let current = "^".repeat(n - 1);
+      let result = "";
+
+      while (result.length < maxLength) {
+        const possibilities = markovChain[current];
+        if (!possibilities) break;
+
+        const next = possibilities[Math.floor(Math.random() * possibilities.length)];
+        if (next === "$") break;
+
+        result += next;
+        current = current.slice(1) + next;
+      }
+
+      return result;
+    }
+
+    function generateMarkovWord() {
+      const word = generateWord();
+      currentWord = word;
+      document.getElementById("wordDisplay").textContent = word;
       document.getElementById("status").textContent = "";
     }
 
@@ -51,7 +102,7 @@
       const options = {
         method: 'GET',
         headers: {
-          'X-RapidAPI-Key': '81cc7ecc64msh9b91aa89fbf36e5p19d919jsn3f1034a603a8',  // 🔑 Replace this
+          'X-RapidAPI-Key': '81cc7ecc64msh9b91aa89fbf36e5p19d919jsn3f1034a603a8',  // 🔑 Replace this with your actual key
           'X-RapidAPI-Host': 'domainr.p.rapidapi.com'
         }
       };
@@ -60,7 +111,16 @@
 
       try {
         const response = await fetch(url, options);
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
         const result = await response.json();
+
+        if (!result.status || !result.status[0]) {
+          throw new Error("Unexpected response format.");
+        }
 
         const status = result.status[0].status;
 
@@ -71,13 +131,13 @@
         }
 
       } catch (error) {
-        console.error(error);
-        document.getElementById("status").textContent = "Error checking domain.";
+        console.error("Domain check failed:", error);
+        document.getElementById("status").textContent = "⚠️ Error checking domain.";
       }
     }
 
-    // Generate a word on load
-    generateWord();
+    // Load words on startup
+    loadWords();
   </script>
 
 </body>
