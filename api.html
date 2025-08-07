@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Markov Domain Generator</title>
+  <title>Creative Domain Generator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       margin: 50px auto;
-      max-width: 600px;
+      max-width: 700px;
     }
     input, select, button {
       padding: 8px;
@@ -35,7 +35,7 @@
 </head>
 <body>
 
-  <h1>Markov Domain Generator</h1>
+  <h1>Creative Domain Generator</h1>
 
   <div>
     <label>Min Length:
@@ -45,13 +45,13 @@
       <input type="number" id="maxLength" value="8" min="1">
     </label>
     <label>Words to Generate:
-      <input type="number" id="wordCount" value="5" min="1" max="20">
+      <input type="number" id="wordCount" value="10" min="1" max="50">
     </label>
     <label>Creativity:
       <select id="creativity">
         <option value="1">🔥 Wild (n=1)</option>
-        <option value="2" selected>🎨 Medium (n=2)</option>
-        <option value="3">🧠 Cohesive (n=3)</option>
+        <option value="2">🎨 Medium (n=2)</option>
+        <option value="3" selected>🧠 Balanced (n=3)</option>
         <option value="4">🛡️ Conservative (n=4)</option>
       </select>
     </label>
@@ -65,6 +65,8 @@
     let markovChain = {};
     let seedWords = [];
 
+    const suffixes = ["ly", "ify", "gen", "io", "zone", "ster", "lab", "hub"];
+
     async function loadWords() {
       try {
         const response = await fetch('words.txt');
@@ -76,7 +78,7 @@
       }
     }
 
-    function buildMarkovChain(words, n = 2) {
+    function buildMarkovChain(words, n = 3) {
       markovChain = {};
       for (const word of words) {
         const padded = "^".repeat(n - 1) + word + "$";
@@ -89,22 +91,49 @@
       }
     }
 
-    function generateWord(minLength = 4, maxLength = 8, n = 2) {
+    function weightedPick(arr) {
+      if (arr.length === 1) return arr[0];
+      return Math.random() < 0.8
+        ? arr[Math.floor(Math.random() * Math.min(2, arr.length))] // Top 2 bias
+        : arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function isPronounceable(word) {
+      const badPatterns = [
+        /[^aeiou]{4,}/,  // 4+ consonants
+        /[aeiou]{3,}/,   // 3+ vowels
+        /[qxz]{2,}/,     // rare consonant runs
+        /^.{0,2}$/       // too short
+      ];
+      return !badPatterns.some(p => p.test(word));
+    }
+
+    function generateWord(minLength = 4, maxLength = 8, n = 3) {
       let attempts = 0;
       while (attempts < 100) {
-        let current = "^".repeat(n - 1);
+        const actualN = Math.random() < 0.3 ? Math.max(2, n - 1) : n;
+        buildMarkovChain(seedWords, actualN);
+
+        let current = "^".repeat(actualN - 1);
         let result = "";
+
         while (result.length < maxLength) {
           const possibilities = markovChain[current];
           if (!possibilities) break;
-          const next = possibilities[Math.floor(Math.random() * possibilities.length)];
+          const next = weightedPick(possibilities);
           if (next === "$") break;
           result += next;
           current = current.slice(1) + next;
         }
-        if (result.length >= minLength && result.length <= maxLength) {
+
+        if (result.length >= minLength && result.length <= maxLength && isPronounceable(result)) {
+          // Occasionally append suffix
+          if (Math.random() < 0.3) {
+            result += suffixes[Math.floor(Math.random() * suffixes.length)];
+          }
           return result;
         }
+
         attempts++;
       }
       return null;
@@ -113,10 +142,8 @@
     function generateWords() {
       const minLength = parseInt(document.getElementById("minLength").value) || 4;
       const maxLength = parseInt(document.getElementById("maxLength").value) || 8;
-      const count = parseInt(document.getElementById("wordCount").value) || 5;
-      const n = parseInt(document.getElementById("creativity").value) || 2;
-
-      buildMarkovChain(seedWords, n); // Rebuild chain with selected creativity
+      const count = Math.min(parseInt(document.getElementById("wordCount").value) || 10, 50);
+      const n = parseInt(document.getElementById("creativity").value) || 3;
 
       const resultsDiv = document.getElementById("results");
       resultsDiv.innerHTML = "";
@@ -154,7 +181,7 @@
       const options = {
         method: 'GET',
         headers: {
-          'X-RapidAPI-Key': '81cc7ecc64msh9b91aa89fbf36e5p19d919jsn3f1034a603a8',  // Replace with your real key
+          'X-RapidAPI-Key': '81cc7ecc64msh9b91aa89fbf36e5p19d919jsn3f1034a603a8',  // Replace with your actual key
           'X-RapidAPI-Host': 'domainr.p.rapidapi.com'
         }
       };
@@ -186,7 +213,7 @@
       }
     }
 
-    loadWords(); // Load word seed on page load
+    loadWords(); // Load seed file on load
   </script>
 
 </body>
