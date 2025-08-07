@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Creative Domain Generator</title>
+  <title>Smart Domain Generator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       margin: 50px auto;
-      max-width: 700px;
+      max-width: 750px;
     }
     input, select, button {
       padding: 8px;
@@ -31,11 +31,19 @@
       margin-left: 10px;
       font-size: 14px;
     }
+    .heart {
+      cursor: pointer;
+      color: gray;
+      margin-left: 10px;
+    }
+    .heart.liked {
+      color: red;
+    }
   </style>
 </head>
 <body>
 
-  <h1>Creative Domain Generator</h1>
+  <h1>Smart Domain Generator</h1>
 
   <div>
     <label>Min Length:
@@ -64,16 +72,12 @@
   <script>
     let markovChain = {};
     let seedWords = [];
+    const likedWords = [];
 
     async function loadWords() {
-      try {
-        const response = await fetch('words.txt');
-        const text = await response.text();
-        seedWords = text.split(/\r?\n/).map(w => w.trim().toLowerCase()).filter(Boolean);
-      } catch (err) {
-        document.getElementById("results").textContent = "⚠️ Failed to load words.txt";
-        console.error("Error loading words.txt:", err);
-      }
+      const response = await fetch('words.txt');
+      const text = await response.text();
+      seedWords = text.split(/\r?\n/).map(w => w.trim().toLowerCase()).filter(Boolean);
     }
 
     function buildMarkovChain(words, n = 3) {
@@ -92,23 +96,72 @@
     function weightedPick(arr) {
       if (arr.length === 1) return arr[0];
       return Math.random() < 0.8
-        ? arr[Math.floor(Math.random() * Math.min(2, arr.length))] // bias toward common options
+        ? arr[Math.floor(Math.random() * Math.min(2, arr.length))]
         : arr[Math.floor(Math.random() * arr.length)];
     }
 
     function isPronounceable(word) {
       const badPatterns = [
-        /[^aeiou]{4,}/,  // 4+ consonants
-        /[aeiou]{3,}/,   // 3+ vowels
-        /[qxz]{2,}/,     // uncommon cluster
-        /^.{0,2}$/       // too short
+        /[^aeiou]{4,}/,
+        /[aeiou]{3,}/,
+        /[qxz]{2,}/,
+        /^.{0,2}$/
       ];
       return !badPatterns.some(p => p.test(word));
     }
 
-    function generateWord(minLength = 4, maxLength = 8, n = 3) {
+    function extractFeatures(word) {
+      const vowels = word.match(/[aeiou]/g) || [];
+      const doubleLetters = /(.)\1/.test(word);
+      const consonantClusters = word.match(/[^aeiou]{3,}/g) || [];
+      return {
+        startsWithVowel: /^[aeiou]/.test(word),
+        endsWithVowel: /[aeiou]$/.test(word),
+        vowelCount: vowels.length,
+        hasDoubleLetters: doubleLetters,
+        consonantClusterCount: consonantClusters.length,
+        length: word.length
+      };
+    }
+
+    function trainBayesClassifier() {
+      const counts = {
+        total: likedWords.length,
+        features: {}
+      };
+
+      likedWords.forEach(word => {
+        const feats = extractFeatures(word);
+        for (let key in feats) {
+          const val = feats[key];
+          const featKey = `${key}:${val}`;
+          counts.features[featKey] = (counts.features[featKey] || 0) + 1;
+        }
+      });
+
+      return counts;
+    }
+
+    function scoreWordBayes(word, model) {
+      if (model.total === 0) return 1; // No data, neutral score
+
+      const feats = extractFeatures(word);
+      let score = 1;
+      for (let key in feats) {
+        const val = feats[key];
+        const featKey = `${key}:${val}`;
+        const prob = (model.features[featKey] || 0.1) / model.total;
+        score *= prob;
+      }
+      return score;
+    }
+
+    function generateWord(minLength = 4, maxLength = 8, n = 3, bayesModel = null) {
       let attempts = 0;
-      while (attempts < 100) {
+      let best = null;
+      let bestScore = 0;
+
+      while (attempts < 50) {
         const actualN = Math.random() < 0.3 ? Math.max(2, n - 1) : n;
         buildMarkovChain(seedWords, actualN);
 
@@ -125,12 +178,16 @@
         }
 
         if (result.length >= minLength && result.length <= maxLength && isPronounceable(result)) {
-          return result;
+          const score = scoreWordBayes(result, bayesModel);
+          if (score > bestScore) {
+            best = result;
+            bestScore = score;
+          }
         }
 
         attempts++;
       }
-      return null;
+      return best;
     }
 
     function generateWords() {
@@ -139,11 +196,12 @@
       const count = Math.min(parseInt(document.getElementById("wordCount").value) || 10, 50);
       const n = parseInt(document.getElementById("creativity").value) || 3;
 
+      const bayesModel = trainBayesClassifier();
       const resultsDiv = document.getElementById("results");
       resultsDiv.innerHTML = "";
 
       for (let i = 0; i < count; i++) {
-        const word = generateWord(minLength, maxLength, n);
+        const word = generateWord(minLength, maxLength, n, bayesModel);
         if (!word) continue;
 
         const block = document.createElement("div");
@@ -152,6 +210,14 @@
         const span = document.createElement("span");
         span.className = "word";
         span.textContent = word;
+
+        const heart = document.createElement("span");
+        heart.textContent = "❤️";
+        heart.className = "heart";
+        heart.onclick = () => {
+          likedWords.push(word);
+          heart.classList.add("liked");
+        };
 
         const button = document.createElement("button");
         button.textContent = "Check .com";
@@ -162,6 +228,7 @@
         status.textContent = "";
 
         block.appendChild(span);
+        block.appendChild(heart);
         block.appendChild(button);
         block.appendChild(status);
         resultsDiv.appendChild(block);
@@ -207,7 +274,7 @@
       }
     }
 
-    loadWords(); // Load on page load
+    loadWords();
   </script>
 
 </body>
