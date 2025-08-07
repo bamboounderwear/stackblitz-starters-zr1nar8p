@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Domain Checker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 100px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Random Word Domain Checker</h1>
+  <h2 id="wordDisplay">loading...</h2>
+
+  <button onclick="generateWord()">🔁 New Word</button>
+  <button onclick="checkAvailability()">🔍 Check .com</button>
+
+  <div id="status"></div>
+
+  <script>
+    const words = [
+      "zebra", "lunar", "orbit", "tiger", "nexus", "flare",
+      "echo", "glyph", "nova", "blaze", "vortex", "quark"
+    ];
+
+    let currentWord = "";
+
+    function generateWord() {
+      currentWord = words[Math.floor(Math.random() * words.length)];
+      document.getElementById("wordDisplay").textContent = currentWord;
+      document.getElementById("status").textContent = "";
+    }
+
+    async function checkAvailability() {
+      const domain = currentWord + ".com";
+      const url = `https://domainr.p.rapidapi.com/v2/status?domain=${domain}`;
+
+      const options = {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': '81cc7ecc64msh9b91aa89fbf36e5p19d919jsn3f1034a603a8',  // 🔑 Replace this
+          'X-RapidAPI-Host': 'domainr.p.rapidapi.com'
+        }
+      };
+
+      document.getElementById("status").textContent = "Checking...";
+
+      try {
+        const response = await fetch(url, options);
+        const result = await response.json();
+
+        const status = result.status[0].status;
+
+        if (status.includes("inactive")) {
+          document.getElementById("status").textContent = `✅ ${domain} is available!`;
+        } else {
+          document.getElementById("status").textContent = `❌ ${domain} is taken.`;
+        }
+
+      } catch (error) {
+        console.error(error);
+        document.getElementById("status").textContent = "Error checking domain.";
+      }
+    }
+
+    // Generate a word on load
+    generateWord();
+  </script>
+
+</body>
+</html>
