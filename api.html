@@ -7,55 +7,67 @@
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      margin-top: 100px;
+      margin: 50px auto;
+      max-width: 600px;
     }
-    button {
-      padding: 10px 20px;
-      margin: 10px;
+    input, button {
+      padding: 8px;
+      margin: 5px;
       font-size: 16px;
-      cursor: pointer;
     }
-    #status {
-      margin-top: 20px;
+    #results {
+      margin-top: 30px;
+    }
+    .word-block {
+      margin: 10px 0;
+      font-size: 20px;
+    }
+    .word {
       font-weight: bold;
+      margin-right: 10px;
     }
-    #wordDisplay {
-      font-size: 32px;
-      margin: 20px;
-      color: #333;
+    .status {
+      display: inline-block;
+      margin-left: 10px;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
 
   <h1>Markov Domain Generator</h1>
-  <h2 id="wordDisplay">Loading...</h2>
 
-  <button onclick="generateMarkovWord()">🔁 New Word</button>
-  <button onclick="checkAvailability()">🔍 Check .com</button>
+  <div>
+    <label>Min Length:
+      <input type="number" id="minLength" value="4" min="1">
+    </label>
+    <label>Max Length:
+      <input type="number" id="maxLength" value="8" min="1">
+    </label>
+    <label>Words to Generate:
+      <input type="number" id="wordCount" value="5" min="1" max="20">
+    </label>
+    <button onclick="generateWords()">🔁 Generate</button>
+  </div>
 
-  <div id="status"></div>
+  <div id="results"></div>
 
   <script>
-    let currentWord = "";
     let markovChain = {};
     let seedWords = [];
 
-    // Load training words from words.txt
     async function loadWords() {
       try {
         const response = await fetch('words.txt');
         const text = await response.text();
         seedWords = text.split(/\r?\n/).map(w => w.trim().toLowerCase()).filter(Boolean);
         buildMarkovChain(seedWords);
-        generateMarkovWord(); // Show first word
       } catch (err) {
-        document.getElementById("wordDisplay").textContent = "⚠️ Failed to load words.txt";
+        document.getElementById("results").textContent = "⚠️ Failed to load words.txt";
         console.error("Error loading words.txt:", err);
       }
     }
 
-    // Build Markov chain with n-gram prefixes
     function buildMarkovChain(words, n = 2) {
       markovChain = {};
       for (const word of words) {
@@ -69,74 +81,101 @@
       }
     }
 
-    // Generate a new pseudo-word
-    function generateWord(maxLength = 10, n = 2) {
-      let current = "^".repeat(n - 1);
-      let result = "";
-
-      while (result.length < maxLength) {
-        const possibilities = markovChain[current];
-        if (!possibilities) break;
-
-        const next = possibilities[Math.floor(Math.random() * possibilities.length)];
-        if (next === "$") break;
-
-        result += next;
-        current = current.slice(1) + next;
+    function generateWord(minLength = 4, maxLength = 8, n = 2) {
+      let attempts = 0;
+      while (attempts < 100) {
+        let current = "^".repeat(n - 1);
+        let result = "";
+        while (result.length < maxLength) {
+          const possibilities = markovChain[current];
+          if (!possibilities) break;
+          const next = possibilities[Math.floor(Math.random() * possibilities.length)];
+          if (next === "$") break;
+          result += next;
+          current = current.slice(1) + next;
+        }
+        if (result.length >= minLength && result.length <= maxLength) {
+          return result;
+        }
+        attempts++;
       }
-
-      return result;
+      return null;
     }
 
-    function generateMarkovWord() {
-      const word = generateWord();
-      currentWord = word;
-      document.getElementById("wordDisplay").textContent = word;
-      document.getElementById("status").textContent = "";
+    function generateWords() {
+      const minLength = parseInt(document.getElementById("minLength").value) || 4;
+      const maxLength = parseInt(document.getElementById("maxLength").value) || 8;
+      const count = parseInt(document.getElementById("wordCount").value) || 5;
+
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "";
+
+      for (let i = 0; i < count; i++) {
+        const word = generateWord(minLength, maxLength);
+        if (!word) continue;
+
+        const block = document.createElement("div");
+        block.className = "word-block";
+
+        const span = document.createElement("span");
+        span.className = "word";
+        span.textContent = word;
+
+        const button = document.createElement("button");
+        button.textContent = "Check .com";
+        button.onclick = () => checkAvailability(word, block);
+
+        const status = document.createElement("span");
+        status.className = "status";
+        status.textContent = "";
+
+        block.appendChild(span);
+        block.appendChild(button);
+        block.appendChild(status);
+        resultsDiv.appendChild(block);
+      }
     }
 
-    async function checkAvailability() {
-      const domain = currentWord + ".com";
+    async function checkAvailability(word, container) {
+      const domain = word + ".com";
       const url = `https://domainr.p.rapidapi.com/v2/status?domain=${domain}`;
 
       const options = {
         method: 'GET',
         headers: {
-          'X-RapidAPI-Key': '81cc7ecc64msh9b91aa89fbf36e5p19d919jsn3f1034a603a8',  // 🔑 Replace this with your actual key
+          'X-RapidAPI-Key': '81cc7ecc64msh9b91aa89fbf36e5p19d919jsn3f1034a603a8',  // 🔑 Replace with your actual key
           'X-RapidAPI-Host': 'domainr.p.rapidapi.com'
         }
       };
 
-      document.getElementById("status").textContent = "Checking...";
+      const statusSpan = container.querySelector('.status');
+      statusSpan.textContent = "Checking...";
 
       try {
         const response = await fetch(url, options);
-
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`API error: ${response.status}`);
         const result = await response.json();
 
-        if (!result.status || !result.status[0]) {
-          throw new Error("Unexpected response format.");
-        }
+        if (!result.status || !result.status[0]) throw new Error("Unexpected response format.");
 
         const status = result.status[0].status;
 
         if (status.includes("inactive")) {
-          document.getElementById("status").textContent = `✅ ${domain} is available!`;
+          statusSpan.textContent = `✅ Available`;
+          statusSpan.style.color = "green";
         } else {
-          document.getElementById("status").textContent = `❌ ${domain} is taken.`;
+          statusSpan.textContent = `❌ Taken`;
+          statusSpan.style.color = "red";
         }
 
-      } catch (error) {
-        console.error("Domain check failed:", error);
-        document.getElementById("status").textContent = "⚠️ Error checking domain.";
+      } catch (err) {
+        console.error("API Error:", err);
+        statusSpan.textContent = "⚠️ Error";
+        statusSpan.style.color = "orange";
       }
     }
 
-    // Load words on startup
+    // Load training words on startup
     loadWords();
   </script>
 
