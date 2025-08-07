@@ -5,3 +5,13 @@ frontier
 loyalty
 capitales
 fan
+game
+fanos
+pitcher
+stadium
+gameday
+homerun
+tickets
+points
+hub
+base
