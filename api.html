@@ -10,7 +10,7 @@
       margin: 50px auto;
       max-width: 600px;
     }
-    input, button {
+    input, select, button {
       padding: 8px;
       margin: 5px;
       font-size: 16px;
@@ -47,6 +47,15 @@
     <label>Words to Generate:
       <input type="number" id="wordCount" value="5" min="1" max="20">
     </label>
+    <label>Creativity:
+      <select id="creativity">
+        <option value="1">🔥 Wild (n=1)</option>
+        <option value="2" selected>🎨 Medium (n=2)</option>
+        <option value="3">🧠 Cohesive (n=3)</option>
+        <option value="4">🛡️ Conservative (n=4)</option>
+      </select>
+    </label>
+    <br>
     <button onclick="generateWords()">🔁 Generate</button>
   </div>
 
@@ -61,7 +70,6 @@
         const response = await fetch('words.txt');
         const text = await response.text();
         seedWords = text.split(/\r?\n/).map(w => w.trim().toLowerCase()).filter(Boolean);
-        buildMarkovChain(seedWords);
       } catch (err) {
         document.getElementById("results").textContent = "⚠️ Failed to load words.txt";
         console.error("Error loading words.txt:", err);
@@ -106,12 +114,15 @@
       const minLength = parseInt(document.getElementById("minLength").value) || 4;
       const maxLength = parseInt(document.getElementById("maxLength").value) || 8;
       const count = parseInt(document.getElementById("wordCount").value) || 5;
+      const n = parseInt(document.getElementById("creativity").value) || 2;
+
+      buildMarkovChain(seedWords, n); // Rebuild chain with selected creativity
 
       const resultsDiv = document.getElementById("results");
       resultsDiv.innerHTML = "";
 
       for (let i = 0; i < count; i++) {
-        const word = generateWord(minLength, maxLength);
+        const word = generateWord(minLength, maxLength, n);
         if (!word) continue;
 
         const block = document.createElement("div");
@@ -143,7 +154,7 @@
       const options = {
         method: 'GET',
         headers: {
-          'X-RapidAPI-Key': '81cc7ecc64msh9b91aa89fbf36e5p19d919jsn3f1034a603a8',  // 🔑 Replace with your actual key
+          'X-RapidAPI-Key': '81cc7ecc64msh9b91aa89fbf36e5p19d919jsn3f1034a603a8',  // Replace with your real key
           'X-RapidAPI-Host': 'domainr.p.rapidapi.com'
         }
       };
@@ -175,8 +186,7 @@
       }
     }
 
-    // Load training words on startup
-    loadWords();
+    loadWords(); // Load word seed on page load
   </script>
 
 </body>
