@@ -1,284 +1,318 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Smart Domain Generator</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 50px auto;
-      max-width: 750px;
-    }
-    input, select, button {
-      padding: 8px;
-      margin: 5px;
-      font-size: 16px;
-    }
-    #results {
-      margin-top: 30px;
-    }
-    .word-block {
-      margin: 10px 0;
-      font-size: 20px;
-    }
-    .word {
-      font-weight: bold;
-      margin-right: 10px;
-    }
-    .status {
-      display: inline-block;
-      margin-left: 10px;
-      font-size: 14px;
-    }
-    .heart {
-      cursor: pointer;
-      color: gray;
-      margin-left: 10px;
-    }
-    .heart.liked {
-      color: red;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Domain Generator</title>
+<style>
+  :root {
+    --primary: #4CAFef;
+    --accent: #ff4081;
+    --bg: #f7f9fc;
+    --text: #222;
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 1rem;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  .controls label {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.9rem;
+  }
+
+  input, select, button {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: var(--radius);
+    border: 1px solid #ccc;
+  }
+
+  button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+  }
+
+  button:hover {
+    background: #3995dc;
+  }
+
+  #results {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    margin-top: 1rem;
+  }
+
+  .card {
+    background: white;
+    padding: 1rem;
+    border-radius: var(--radius);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.15s;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+  }
+
+  .word {
+    font-weight: bold;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: auto;
+  }
+
+  .heart {
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: gray;
+    transition: color 0.2s;
+  }
+
+  .heart.liked {
+    color: var(--accent);
+  }
+
+  .status {
+    font-size: 0.9rem;
+    margin-top: 0.4rem;
+  }
+
+  @media (max-width: 500px) {
+    h1 { font-size: 1.5rem; }
+  }
+</style>
 </head>
 <body>
 
-  <h1>Smart Domain Generator</h1>
+<h1>Smart Domain Generator</h1>
 
-  <div>
-    <label>Min Length:
-      <input type="number" id="minLength" value="4" min="1">
-    </label>
-    <label>Max Length:
-      <input type="number" id="maxLength" value="8" min="1">
-    </label>
-    <label>Words to Generate:
-      <input type="number" id="wordCount" value="10" min="1" max="50">
-    </label>
-    <label>Creativity:
-      <select id="creativity">
-        <option value="1">🔥 Wild (n=1)</option>
-        <option value="2">🎨 Medium (n=2)</option>
-        <option value="3" selected>🧠 Balanced (n=3)</option>
-        <option value="4">🛡️ Conservative (n=4)</option>
-      </select>
-    </label>
-    <br>
-    <button onclick="generateWords()">🔁 Generate</button>
-  </div>
+<div class="controls">
+  <label>Min Length:
+    <input type="number" id="minLength" value="4" min="1">
+  </label>
+  <label>Max Length:
+    <input type="number" id="maxLength" value="8" min="1">
+  </label>
+  <label>Count:
+    <input type="number" id="wordCount" value="10" min="1" max="50">
+  </label>
+  <label>Creativity:
+    <select id="creativity">
+      <option value="1">🔥 Wild</option>
+      <option value="2">🎨 Medium</option>
+      <option value="3" selected>🧠 Balanced</option>
+      <option value="4">🛡️ Conservative</option>
+    </select>
+  </label>
+  <button onclick="generateWords()">🔁 Generate</button>
+</div>
 
-  <div id="results"></div>
+<div id="results"></div>
 
-  <script>
-    let markovChain = {};
-    let seedWords = [];
-    const likedWords = [];
+<script>
+let markovChain = {};
+let seedWords = [];
+const likedWords = [];
 
-    async function loadWords() {
-      const response = await fetch('words.txt');
-      const text = await response.text();
-      seedWords = text.split(/\r?\n/).map(w => w.trim().toLowerCase()).filter(Boolean);
+async function loadWords() {
+  const response = await fetch('words.txt');
+  const text = await response.text();
+  seedWords = text.split(/\r?\n/).map(w => w.trim().toLowerCase()).filter(Boolean);
+}
+loadWords();
+
+// Build Markov chain
+function buildMarkovChain(words, n = 3) {
+  markovChain = {};
+  for (const word of words) {
+    const padded = "^".repeat(n - 1) + word + "$";
+    for (let i = 0; i <= padded.length - n; i++) {
+      const prefix = padded.slice(i, i + n - 1);
+      const nextChar = padded[i + n - 1];
+      (markovChain[prefix] ||= []).push(nextChar);
     }
+  }
+}
 
-    function buildMarkovChain(words, n = 3) {
-      markovChain = {};
-      for (const word of words) {
-        const padded = "^".repeat(n - 1) + word + "$";
-        for (let i = 0; i <= padded.length - n; i++) {
-          const prefix = padded.slice(i, i + n - 1);
-          const nextChar = padded[i + n - 1];
-          if (!markovChain[prefix]) markovChain[prefix] = [];
-          markovChain[prefix].push(nextChar);
-        }
+// Weighted pick with bias towards common patterns
+function weightedPick(arr) {
+  if (!arr.length) return "";
+  const sorted = [...arr].sort();
+  return Math.random() < 0.7
+    ? sorted[Math.floor(Math.random() * Math.min(2, arr.length))]
+    : arr[Math.floor(Math.random() * arr.length)];
+}
+
+function isPronounceable(word) {
+  const badPatterns = [
+    /[^aeiou]{4,}/, /[aeiou]{3,}/, /[qxz]{2,}/, /^.{0,2}$/
+  ];
+  return !badPatterns.some(p => p.test(word));
+}
+
+function extractFeatures(word) {
+  const vowels = word.match(/[aeiou]/g) || [];
+  return {
+    startsWithVowel: /^[aeiou]/.test(word),
+    endsWithVowel: /[aeiou]$/.test(word),
+    vowelCount: vowels.length,
+    hasDoubleLetters: /(.)\1/.test(word),
+    consonantClusters: (word.match(/[^aeiou]{3,}/g) || []).length,
+    length: word.length
+  };
+}
+
+function trainBayesClassifier() {
+  const counts = { total: likedWords.length, features: {} };
+  likedWords.forEach(w => {
+    const feats = extractFeatures(w);
+    for (let k in feats) {
+      const val = feats[k];
+      counts.features[`${k}:${val}`] = (counts.features[`${k}:${val}`] || 0) + 1;
+    }
+  });
+  return counts;
+}
+
+function scoreWordBayes(word, model) {
+  if (model.total === 0) return 1;
+  const feats = extractFeatures(word);
+  return Object.keys(feats).reduce((score, k) => {
+    const val = feats[k];
+    const prob = (model.features[`${k}:${val}`] || 0.1) / model.total;
+    return score * prob;
+  }, 1);
+}
+
+function generateWord(minLength, maxLength, n, bayesModel) {
+  let best = null, bestScore = 0;
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const actualN = Math.random() < 0.4 ? Math.max(2, n - 1) : n;
+    buildMarkovChain(seedWords, actualN);
+    let current = "^".repeat(actualN - 1), result = "";
+    while (result.length < maxLength) {
+      const next = weightedPick(markovChain[current] || []);
+      if (!next || next === "$") break;
+      result += next;
+      current = current.slice(1) + next;
+    }
+    if (result.length >= minLength && isPronounceable(result)) {
+      const score = scoreWordBayes(result, bayesModel);
+      if (score > bestScore) { best = result; bestScore = score; }
+    }
+  }
+  return best;
+}
+
+function generateWords() {
+  const minLength = +document.getElementById("minLength").value;
+  const maxLength = +document.getElementById("maxLength").value;
+  const count = Math.min(+document.getElementById("wordCount").value, 50);
+  const n = +document.getElementById("creativity").value;
+
+  const bayesModel = trainBayesClassifier();
+  const results = document.getElementById("results");
+  results.innerHTML = "";
+
+  for (let i = 0; i < count; i++) {
+    const word = generateWord(minLength, maxLength, n, bayesModel);
+    if (!word) continue;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const title = document.createElement("div");
+    title.className = "word";
+    title.textContent = word;
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    const heart = document.createElement("span");
+    heart.textContent = "❤️";
+    heart.className = "heart";
+    heart.onclick = () => {
+      likedWords.push(word);
+      heart.classList.add("liked");
+    };
+
+    const checkBtn = document.createElement("button");
+    checkBtn.textContent = ".com?";
+    checkBtn.onclick = () => checkAvailability(word, card);
+
+    actions.append(heart, checkBtn);
+
+    const status = document.createElement("div");
+    status.className = "status";
+
+    card.append(title, actions, status);
+    results.appendChild(card);
+  }
+}
+
+async function checkAvailability(word, container) {
+  const domain = word + ".com";
+  const url = `https://domainr.p.rapidapi.com/v2/status?domain=${domain}`;
+  const statusEl = container.querySelector(".status");
+  statusEl.textContent = "Checking...";
+
+  try {
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'X-RapidAPI-Key': 'YOUR_KEY_HERE',
+        'X-RapidAPI-Host': 'domainr.p.rapidapi.com'
       }
+    });
+    const data = await res.json();
+    const status = data.status?.[0]?.status || "";
+    if (status.includes("inactive")) {
+      statusEl.textContent = "✅ Available";
+      statusEl.style.color = "green";
+    } else {
+      statusEl.textContent = "❌ Taken";
+      statusEl.style.color = "red";
     }
-
-    function weightedPick(arr) {
-      if (arr.length === 1) return arr[0];
-      return Math.random() < 0.8
-        ? arr[Math.floor(Math.random() * Math.min(2, arr.length))]
-        : arr[Math.floor(Math.random() * arr.length)];
-    }
-
-    function isPronounceable(word) {
-      const badPatterns = [
-        /[^aeiou]{4,}/,
-        /[aeiou]{3,}/,
-        /[qxz]{2,}/,
-        /^.{0,2}$/
-      ];
-      return !badPatterns.some(p => p.test(word));
-    }
-
-    function extractFeatures(word) {
-      const vowels = word.match(/[aeiou]/g) || [];
-      const doubleLetters = /(.)\1/.test(word);
-      const consonantClusters = word.match(/[^aeiou]{3,}/g) || [];
-      return {
-        startsWithVowel: /^[aeiou]/.test(word),
-        endsWithVowel: /[aeiou]$/.test(word),
-        vowelCount: vowels.length,
-        hasDoubleLetters: doubleLetters,
-        consonantClusterCount: consonantClusters.length,
-        length: word.length
-      };
-    }
-
-    function trainBayesClassifier() {
-      const counts = {
-        total: likedWords.length,
-        features: {}
-      };
-
-      likedWords.forEach(word => {
-        const feats = extractFeatures(word);
-        for (let key in feats) {
-          const val = feats[key];
-          const featKey = `${key}:${val}`;
-          counts.features[featKey] = (counts.features[featKey] || 0) + 1;
-        }
-      });
-
-      return counts;
-    }
-
-    function scoreWordBayes(word, model) {
-      if (model.total === 0) return 1; // No training yet
-      const feats = extractFeatures(word);
-      let score = 1;
-      for (let key in feats) {
-        const val = feats[key];
-        const featKey = `${key}:${val}`;
-        const prob = (model.features[featKey] || 0.1) / model.total;
-        score *= prob;
-      }
-      return score;
-    }
-
-    function generateWord(minLength = 4, maxLength = 8, n = 3, bayesModel = null) {
-      const useBayes = Math.random() >= 0.3; // 70% of time use Bayes
-      let attempts = 0;
-      let best = null;
-      let bestScore = 0;
-
-      while (attempts < 50) {
-        const actualN = Math.random() < 0.3 ? Math.max(2, n - 1) : n;
-        buildMarkovChain(seedWords, actualN);
-
-        let current = "^".repeat(actualN - 1);
-        let result = "";
-
-        while (result.length < maxLength) {
-          const possibilities = markovChain[current];
-          if (!possibilities) break;
-          const next = weightedPick(possibilities);
-          if (next === "$") break;
-          result += next;
-          current = current.slice(1) + next;
-        }
-
-        if (result.length >= minLength && result.length <= maxLength && isPronounceable(result)) {
-          if (!useBayes) return result; // Pure creativity branch
-
-          const score = scoreWordBayes(result, bayesModel);
-          if (score > bestScore) {
-            best = result;
-            bestScore = score;
-          }
-        }
-
-        attempts++;
-      }
-
-      return best;
-    }
-
-    function generateWords() {
-      const minLength = parseInt(document.getElementById("minLength").value) || 4;
-      const maxLength = parseInt(document.getElementById("maxLength").value) || 8;
-      const count = Math.min(parseInt(document.getElementById("wordCount").value) || 10, 50);
-      const n = parseInt(document.getElementById("creativity").value) || 3;
-
-      const bayesModel = trainBayesClassifier();
-      const resultsDiv = document.getElementById("results");
-      resultsDiv.innerHTML = "";
-
-      for (let i = 0; i < count; i++) {
-        const word = generateWord(minLength, maxLength, n, bayesModel);
-        if (!word) continue;
-
-        const block = document.createElement("div");
-        block.className = "word-block";
-
-        const span = document.createElement("span");
-        span.className = "word";
-        span.textContent = word;
-
-        const heart = document.createElement("span");
-        heart.textContent = "❤️";
-        heart.className = "heart";
-        heart.onclick = () => {
-          likedWords.push(word);
-          heart.classList.add("liked");
-        };
-
-        const button = document.createElement("button");
-        button.textContent = "Check .com";
-        button.onclick = () => checkAvailability(word, block);
-
-        const status = document.createElement("span");
-        status.className = "status";
-        status.textContent = "";
-
-        block.appendChild(span);
-        block.appendChild(heart);
-        block.appendChild(button);
-        block.appendChild(status);
-        resultsDiv.appendChild(block);
-      }
-    }
-
-    async function checkAvailability(word, container) {
-      const domain = word + ".com";
-      const url = `https://domainr.p.rapidapi.com/v2/status?domain=${domain}`;
-
-      const options = {
-        method: 'GET',
-        headers: {
-          'X-RapidAPI-Key': '81cc7ecc64msh9b91aa89fbf36e5p19d919jsn3f1034a603a8',  // Replace this with your key
-          'X-RapidAPI-Host': 'domainr.p.rapidapi.com'
-        }
-      };
-
-      const statusSpan = container.querySelector('.status');
-      statusSpan.textContent = "Checking...";
-
-      try {
-        const response = await fetch(url, options);
-        if (!response.ok) throw new Error(`API error: ${response.status}`);
-        const result = await response.json();
-
-        if (!result.status || !result.status[0]) throw new Error("Unexpected response format.");
-
-        const status = result.status[0].status;
-
-        if (status.includes("inactive")) {
-          statusSpan.textContent = `✅ Available`;
-          statusSpan.style.color = "green";
-        } else {
-          statusSpan.textContent = `❌ Taken`;
-          statusSpan.style.color = "red";
-        }
-
-      } catch (err) {
-        console.error("API Error:", err);
-        statusSpan.textContent = "⚠️ Error";
-        statusSpan.style.color = "orange";
-      }
-    }
-
-    loadWords();
-  </script>
+  } catch {
+    statusEl.textContent = "⚠️ Error";
+    statusEl.style.color = "orange";
+  }
+}
+</script>
 
 </body>
 </html>
